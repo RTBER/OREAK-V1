@@ -3,95 +3,114 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("SekaiHub: DOMContentLoaded. Iniciando script v4 (rutas de componentes mejoradas).");
 
     // --- Datos de Novelas para el Buscador ---
-    // Si 'presentationPage' es una URL completa (http:// o https://), se usará tal cual.
-    // Si es una ruta relativa, se le añadirá SITE_BASE_PATH.
+    // Modifica esto con tus datos reales.
+    // Para enlaces a OTROS SITIOS WEB o a la versión EN VIVO de tus otras páginas de GitHub, usa la URL COMPLETA.
+    // Para enlaces INTERNOS a este mismo sitio HUBPRI, usa la ruta relativa desde la raíz de HUBPRI.
     const novelsData = [
         { 
-            title: "Ore wa Seikan Kokka no Akutoku Ryōshu!", 
+            title: "Ore wa Seikan Kokka no Akutoku Ryōshu! ", 
             author: "Yomu Mishima",
-            presentationPage: "https://rtber.github.io/HUBPRI/novelas/Ore%20wa%20Seikan%20Kokka%20no%20Akutoku%20Ry%C5%8Dshu!.html", 
+            // Ejemplo de URL completa (podría ser a otro de tus repositorios/sitios)
+            presentationPage: "https://rtber.github.io/HUBPRI/novelas/Ore%20wa%20Seikan%20Kokka%20no%20Akutoku%20Ry%C5%8Dshu!.html", // ¡SUSTITUYE POR LA URL REAL!
         },
         { 
-            title: "Overlord", 
+            title: "Overlord ", 
             author: "Kugane Maruyama",
+            // Ejemplo de ruta local dentro de HUBPRI
             presentationPage: "https://rtber.github.io/HUBPRI/novelas/Overlord.html", 
         },
         { 
             title: "Kage no Jitsuryokusha ni Naritakute!", 
             author: "Aizawa Daisuke",
+            // Ejemplo de URL completa a un sitio oficial
             presentationPage: "https://rtber.github.io/HUBPRI/novelas/Kage%20no%20Jitsuryokusha%20ni%20Naritakute!.html", 
         }
     ];
 
-    function getSiteBasePath() {
-        // <-- ¡¡¡VERIFICA Y CAMBIA ESTO AL NOMBRE EXACTO DE TU REPOSITORIO PRINCIPAL!!!
-        const repoName = 'HUBPRI'; 
-        const hostname = window.location.hostname;
-        const pathname = window.location.pathname;
-        let basePath = "";
-
-        console.log(`[getSiteBasePath] Original Pathname: ${pathname}`);
-
-        if (hostname.endsWith('github.io')) {
-            const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
-            console.log(`[getSiteBasePath] Path Segments:`, pathSegments);
-            console.log(`[getSiteBasePath] Comparando con repoName.toLowerCase(): ${repoName.toLowerCase()}`);
-
-            if (pathSegments.length > 0 && pathSegments[0].toLowerCase() === repoName.toLowerCase()) {
-                basePath = `/${pathSegments[0]}`; 
-                console.log(`[getSiteBasePath] GitHub Pages: repoName encontrado, basePath es: ${basePath}`);
-            } else {
-                console.log(`[getSiteBasePath] GitHub Pages: repoName NO encontrado o sitio de usuario. basePath sigue siendo: "${basePath}" (vacío)`);
+    // Función para determinar la ruta base del sitio
+        function getSiteBasePath() {
+            // ¡¡¡ASEGÚRATE DE QUE ESTE VALOR SEA EL NOMBRE EXACTO DE TU REPOSITORIO EN GITHUB!!!
+            const repoName = 'OREAK-V1';            // <--- VERIFICA Y CAMBIA ESTO SI ES NECESARIO
+            const hostname = window.location.hostname;
+            const pathname = window.location.pathname;
+            let basePath = "";
+        
+            console.log(`[getSiteBasePath] Original Pathname: ${pathname}`);
+        
+            if (hostname.endsWith('github.io')) {
+                // Para GitHub Pages, el path suele ser /repoName/ o /repoName/index.html, etc.
+                // Filtramos para quitar segmentos vacíos que pueden surgir de barras iniciales/finales
+                const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
+                console.log(`[getSiteBasePath] Path Segments:`, pathSegments);
+                console.log(`[getSiteBasePath] Comparando con repoName.toLowerCase(): ${repoName.toLowerCase()}`);
+        
+                if (pathSegments.length > 0 && pathSegments[0].toLowerCase() === repoName.toLowerCase()) {
+                    basePath = `/${pathSegments[0]}`; 
+                    console.log(`[getSiteBasePath] GitHub Pages: repoName encontrado, basePath es: ${basePath}`);
+                } else {
+                    console.log(`[getSiteBasePath] GitHub Pages: repoName NO encontrado como primer segmento o pathSegments vacío. basePath sigue siendo: "${basePath}"`);
+                    // Esto podría suceder si el sitio es un sitio de usuario (rtber.github.io) y el repoName no es parte del path
+                    // O si el repoName está mal escrito.
+                }
+            } else { 
+                // Servidor Local
+                const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
+                console.log(`[getSiteBasePath] Local Server Path Segments:`, pathSegments);
+                if (pathSegments.length > 0 && pathSegments[0].toLowerCase() === repoName.toLowerCase()) {
+                     basePath = `/${pathSegments[0]}`; // Si la URL local incluye el nombre del repo
+                     console.log(`[getSiteBasePath] Local Server: repoName encontrado, basePath es: ${basePath}`);
+                } else {
+                    console.log(`[getSiteBasePath] Local Server: repoName NO encontrado o servido desde raíz. basePath sigue siendo: "${basePath}"`);
+                }
             }
-        } else { 
-            // Para servidor local, asumimos que se sirve desde la raíz del proyecto
-            // o la lógica para detectar subcarpetas localmente se vuelve más compleja y depende del servidor.
-            // Si tu servidor local sirve 'HUBPRI' dentro de otra carpeta (ej: localhost/mis_sitios/HUBPRI/),
-            // necesitarías una lógica más avanzada aquí o configurar tu servidor.
-            // Por simplicidad, para `http://localhost:xxxx/`, basePath será "".
-            console.log(`[getSiteBasePath] Local Server: Asumiendo servicio desde raíz. basePath es: "${basePath}" (vacío)`);
+            return basePath;
         }
-        return basePath;
-    }
-    const SITE_BASE_PATH = getSiteBasePath();
-    console.log(`SekaiHub: SITE_BASE_PATH final deducido: "${SITE_BASE_PATH}"`);
-    
-    async function loadComponent(componentFile, placeholderId) {
-        const fetchUrl = `${SITE_BASE_PATH}/${componentFile}`; 
-        console.log(`SekaiHub: [loadComponent] Página actual: ${window.location.pathname}`);
-        console.log(`SekaiHub: [loadComponent] Intentando fetch de: ${fetchUrl} para placeholder: ${placeholderId}`);
-        try {
-            const response = await fetch(fetchUrl);
-            const responseStatus = response.status;
-            const responseOk = response.ok;
-            const fullAttemptedUrl = new URL(fetchUrl, window.location.origin).href; 
-            console.log(`SekaiHub: [loadComponent] Fetch para ${componentFile} (URL intentada: ${fullAttemptedUrl}) - Status: ${responseStatus}, OK: ${responseOk}`);
-            if (!responseOk) {
-                throw new Error(`No se pudo cargar ${componentFile} desde ${fullAttemptedUrl} (Status: ${responseStatus})`);
+        const SITE_BASE_PATH = getSiteBasePath(); // Esto debe estar después de la definición de la función
+        console.log(`SekaiHub: SITE_BASE_PATH final deducido: "${SITE_BASE_PATH}"`); // Log final
+        
+            async function loadComponent(componentFile, placeholderId) {
+                // Los componentes siempre están en la raíz del proyecto del hub.
+                const fetchUrl = `${SITE_BASE_PATH}/${componentFile}`; 
+        
+                console.log(`SekaiHub: [loadComponent] Página actual: ${window.location.pathname}`);
+                console.log(`SekaiHub: [loadComponent] Intentando fetch de: ${fetchUrl} para placeholder: ${placeholderId}`);
+        
+                try {
+                    const response = await fetch(fetchUrl);
+                    const responseStatus = response.status;
+                    const responseOk = response.ok;
+                    const fullAttemptedUrl = new URL(fetchUrl, window.location.origin).href; 
+        
+                    console.log(`SekaiHub: [loadComponent] Fetch para ${componentFile} (URL intentada: ${fullAttemptedUrl}) - Status: ${responseStatus}, OK: ${responseOk}`);
+        
+                    if (!responseOk) {
+                        throw new Error(`No se pudo cargar ${componentFile} desde ${fullAttemptedUrl} (Status: ${responseStatus})`);
+                    }
+                    const html = await response.text();
+                    const placeholder = document.getElementById(placeholderId);
+                    if (placeholder) {
+                        placeholder.outerHTML = html; 
+                        console.log(`SekaiHub: [loadComponent] Componente '${placeholderId}' cargado DESDE ${fullAttemptedUrl}`);
+                    } else {
+                        console.warn(`SekaiHub: [loadComponent] Placeholder '${placeholderId}' NO ENCONTRADO.`);
+                    }
+                } catch (error) {
+                    console.error(`SekaiHub: [loadComponent] Catch - Error cargando componente '${componentFile}':`, error);
+                    const placeholder = document.getElementById(placeholderId);
+                    if (placeholder) {
+                        placeholder.innerHTML = `<div class="component-error-message" style="color:red; text-align:center; padding:1em; border:1px dashed red; background: #fff0f0;">Error al cargar sección: ${componentFile}.<br>Verifique consola (F12) y ruta: ${fetchUrl}</div>`;
+                    }
+                }
             }
-            const html = await response.text();
-            const placeholder = document.getElementById(placeholderId);
-            if (placeholder) {
-                placeholder.outerHTML = html; 
-                console.log(`SekaiHub: [loadComponent] Componente '${placeholderId}' cargado DESDE ${fullAttemptedUrl}`);
-            } else {
-                console.warn(`SekaiHub: [loadComponent] Placeholder '${placeholderId}' NO ENCONTRADO.`);
-            }
-        } catch (error) {
-            console.error(`SekaiHub: [loadComponent] Catch - Error cargando componente '${componentFile}':`, error);
-            const placeholder = document.getElementById(placeholderId);
-            if (placeholder) {
-                placeholder.innerHTML = `<div class="component-error-message" style="color:red; text-align:center; padding:1em; border:1px dashed red; background: #fff0f0;">Error al cargar sección: ${componentFile}.<br>Verifique consola (F12) y ruta: ${fetchUrl}</div>`;
-            }
-        }
-    }
 
     async function loadLayoutAndInitialize() {
         console.log("SekaiHub: Cargando layout (header y footer)...");
         await Promise.all([
+            // <-- NOMBRES DE ARCHIVOS CORREGIDOS -->
             loadComponent('component_header.html', 'header-placeholder'),
             loadComponent('component_footer.html', 'footer-placeholder')
         ]);
+        // Pequeña demora para asegurar que el DOM se actualice después de outerHTML
         await new Promise(resolve => setTimeout(resolve, 0)); 
         initializeHubFunctionality();
     }
@@ -196,28 +215,24 @@ document.addEventListener('DOMContentLoaded', () => {
         applyHubTheme(savedHubTheme); 
         hubThemeToggleBtns.forEach(btn => btn.addEventListener('click', toggleHubTheme));
 
+        // Variables del buscador (se obtienen cuando se necesitan, dentro de displaySearchResults y los listeners)
         const searchInput = document.getElementById('searchInput');
         const searchResultsDropdown = document.getElementById('searchResultsDropdown');
         const searchButton = document.getElementById('searchButton');
 
-        // --- Variable para la lógica del botón de búsqueda ---
-        let lastSearchHadResults = false;
-
         function displaySearchResults(term) { 
+            // Se obtienen los elementos aquí para asegurar que existen después de cargar el header
             const currentSearchResultsDropdown = document.getElementById('searchResultsDropdown');
-            // currentSearchInput no se usa porque 'term' viene como parámetro.
-            // const currentSearchInput = document.getElementById('searchInput'); 
+            const currentSearchInput = document.getElementById('searchInput'); // No se usa 'term' directamente?
 
-            if (!currentSearchResultsDropdown || !searchInput) { // Usamos searchInput (definido fuera) para la comprobación
+            if (!currentSearchResultsDropdown || !currentSearchInput) { // Comprueba contra currentSearchInput también
                 console.error("Buscador: Elementos HTML 'searchResultsDropdown' o 'searchInput' no encontrados. ¿Cargó el header?");
-                lastSearchHadResults = false;
                 return;
             }
 
             currentSearchResultsDropdown.innerHTML = ''; 
             if (!term || term.length < 2) {
                 currentSearchResultsDropdown.classList.remove('active');
-                lastSearchHadResults = false;
                 return;
             }
 
@@ -228,7 +243,6 @@ document.addEventListener('DOMContentLoaded', () => {
             );
 
             if (matchedNovels.length > 0) {
-                lastSearchHadResults = true; // <--- Se encontraron resultados
                 matchedNovels.slice(0, 4).forEach(novel => { 
                     const item = document.createElement('a');
                     
@@ -249,14 +263,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 
                 const viewAll = document.createElement('a');
-                // Siempre apunta a la URL completa del Hub
                 viewAll.href = `https://rtber.github.io/HUBPRI/todas-las-novelas.html?search=${encodeURIComponent(term)}#todas-las-novelas-section`;
                 viewAll.className = 'search-results-view-all';
                 viewAll.textContent = matchedNovels.length > 4 ? `Ver los ${matchedNovels.length} resultados...` : 'Ver todos los resultados...';
                 currentSearchResultsDropdown.appendChild(viewAll);
                 currentSearchResultsDropdown.classList.add('active');
             } else {
-                lastSearchHadResults = false; // <--- No se encontraron resultados
                 const noResultsItem = document.createElement('div');
                 noResultsItem.className = 'search-result-item no-match';
                 noResultsItem.textContent = 'No se encontraron coincidencias.';
@@ -282,13 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
             searchButton.addEventListener('click', () => {
                 const searchTerm = searchInput.value.trim();
                 if (!searchTerm) return;
-
-                // Redirige solo si la última búsqueda del dropdown NO tuvo resultados
-                if (!lastSearchHadResults) {
-                    window.location.href = `https://rtber.github.io/HUBPRI/todas-las-novelas.html?search=${encodeURIComponent(searchTerm)}#todas-las-novelas-section`;
-                } else {
-                    console.log("Botón de búsqueda presionado, pero el dropdown ya tiene resultados. No se redirige.");
-                }
+                window.location.href = `https://rtber.github.io/HUBPRI/todas-las-novelas.html?search=${encodeURIComponent(searchTerm)}#todas-las-novelas-section`;
             });
         }
 
@@ -329,22 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         const currentPagePathForSearchCheck = window.location.pathname;
-        if (SITE_BASE_PATH === '' && (currentPagePathForSearchCheck === '/' || currentPagePathForSearchCheck === '/index.html' || currentPagePathForSearchCheck.endsWith('todas-las-novelas.html'))) {
-             // Local
-            const urlParams = new URLSearchParams(window.location.search);
-            const searchTermFromUrl = urlParams.get('search');
-            if (searchTermFromUrl && searchInput) { 
-                searchInput.value = decodeURIComponent(searchTermFromUrl);
-                filterNovelCardsOnPage(decodeURIComponent(searchTermFromUrl));
-                
-                const targetSectionId = currentPagePathForSearchCheck.endsWith('todas-las-novelas.html') ? 'todas-las-novelas-section' : 'lista-novelas-section';
-                const novelListSection = document.getElementById(targetSectionId);
-                if (novelListSection && urlParams.has('search')) { 
-                    setTimeout(() => novelListSection.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-                }
-            }
-        } else if (SITE_BASE_PATH !== '' && (currentPagePathForSearchCheck === `${SITE_BASE_PATH}/` || currentPagePathForSearchCheck === `${SITE_BASE_PATH}/index.html` || currentPagePathForSearchCheck.endsWith('todas-las-novelas.html'))) {
-            // GitHub Pages
+        if (currentPagePathForSearchCheck === `${SITE_BASE_PATH}/` || currentPagePathForSearchCheck === `${SITE_BASE_PATH}/index.html` || currentPagePathForSearchCheck.endsWith('todas-las-novelas.html')) {
             const urlParams = new URLSearchParams(window.location.search);
             const searchTermFromUrl = urlParams.get('search');
             if (searchTermFromUrl && searchInput) { 
@@ -421,3 +412,5 @@ document.addEventListener('DOMContentLoaded', () => {
     
     loadLayoutAndInitialize();
 }); // Cierre de DOMContentLoaded
+
+
