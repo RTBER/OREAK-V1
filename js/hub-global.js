@@ -28,73 +28,80 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     // Función para determinar la ruta base del sitio
-    function getSiteBasePath() {
-        // <-- ¡¡¡ASEGÚRATE DE QUE ESTE ES EL NOMBRE EXACTO DE TU REPOSITORIO PRINCIPAL!!!
-        const repoName = 'HUBPRI'; 
-        const hostname = window.location.hostname;
-        const pathname = window.location.pathname;
-
-        console.log(`[getSiteBasePath] Original Pathname: ${pathname}`);
-
-        if (hostname.endsWith('github.io')) {
-            const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
-            console.log(`[getSiteBasePath] Path Segments:`, pathSegments);
-            console.log(`[getSiteBasePath] Comparando con repoName.toLowerCase(): ${repoName.toLowerCase()}`);
-
-            if (pathSegments.length > 0 && pathSegments[0].toLowerCase() === repoName.toLowerCase()) {
-                console.log(`[getSiteBasePath] GitHub Pages: repoName encontrado, basePath será: /${pathSegments[0]}`);
-                return `/${pathSegments[0]}`;
-            } else {
-                console.log(`[getSiteBasePath] GitHub Pages: repoName NO encontrado o sitio de usuario. basePath será: ""`);
-                return ''; 
+        function getSiteBasePath() {
+            // ¡¡¡ASEGÚRATE DE QUE ESTE VALOR SEA EL NOMBRE EXACTO DE TU REPOSITORIO EN GITHUB!!!
+            const repoName = 'HUBPRI'; // <--- VERIFICA Y CAMBIA ESTO SI ES NECESARIO
+            const hostname = window.location.hostname;
+            const pathname = window.location.pathname;
+            let basePath = "";
+        
+            console.log(`[getSiteBasePath] Original Pathname: ${pathname}`);
+        
+            if (hostname.endsWith('github.io')) {
+                // Para GitHub Pages, el path suele ser /repoName/ o /repoName/index.html, etc.
+                // Filtramos para quitar segmentos vacíos que pueden surgir de barras iniciales/finales
+                const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
+                console.log(`[getSiteBasePath] Path Segments:`, pathSegments);
+                console.log(`[getSiteBasePath] Comparando con repoName.toLowerCase(): ${repoName.toLowerCase()}`);
+        
+                if (pathSegments.length > 0 && pathSegments[0].toLowerCase() === repoName.toLowerCase()) {
+                    basePath = `/${pathSegments[0]}`; 
+                    console.log(`[getSiteBasePath] GitHub Pages: repoName encontrado, basePath es: ${basePath}`);
+                } else {
+                    console.log(`[getSiteBasePath] GitHub Pages: repoName NO encontrado como primer segmento o pathSegments vacío. basePath sigue siendo: "${basePath}"`);
+                    // Esto podría suceder si el sitio es un sitio de usuario (rtber.github.io) y el repoName no es parte del path
+                    // O si el repoName está mal escrito.
+                }
+            } else { 
+                // Servidor Local
+                const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
+                console.log(`[getSiteBasePath] Local Server Path Segments:`, pathSegments);
+                if (pathSegments.length > 0 && pathSegments[0].toLowerCase() === repoName.toLowerCase()) {
+                     basePath = `/${pathSegments[0]}`; // Si la URL local incluye el nombre del repo
+                     console.log(`[getSiteBasePath] Local Server: repoName encontrado, basePath es: ${basePath}`);
+                } else {
+                    console.log(`[getSiteBasePath] Local Server: repoName NO encontrado o servido desde raíz. basePath sigue siendo: "${basePath}"`);
+                }
             }
-        } else { // Servidor Local
-            const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
-            console.log(`[getSiteBasePath] Local Server Path Segments:`, pathSegments);
-            // Para pruebas locales, si sirves la carpeta del repo como raíz, no necesitas el repoName en el path.
-            // Si tu servidor local sirve desde una URL que INCLUYE el nombre del repo (ej: localhost/HUBPRI/), descomenta lo siguiente:
-            /*
-            if (pathSegments.length > 0 && pathSegments[0].toLowerCase() === repoName.toLowerCase()) {
-                console.log(`[getSiteBasePath] Local Server: repoName encontrado, basePath será: /${pathSegments[0]}`);
-                return `/${pathSegments[0]}`;
-            }
-            */
-            console.log(`[getSiteBasePath] Local Server: Asumiendo servicio desde raíz del proyecto. basePath será: ""`);
-            return ''; 
+            return basePath;
         }
-    }
-    const SITE_BASE_PATH = getSiteBasePath();
-    console.log(`SekaiHub: SITE_BASE_PATH final deducido: "${SITE_BASE_PATH}"`);
-
-    async function loadComponent(componentFile, placeholderId) {
-        const fetchUrl = `${SITE_BASE_PATH}/${componentFile}`; 
-        console.log(`SekaiHub: [loadComponent] Página actual: ${window.location.pathname}`);
-        console.log(`SekaiHub: [loadComponent] Intentando fetch de: ${fetchUrl} para placeholder: ${placeholderId}`);
-        try {
-            const response = await fetch(fetchUrl);
-            const responseStatus = response.status;
-            const responseOk = response.ok;
-            const fullAttemptedUrl = new URL(fetchUrl, window.location.origin).href; 
-            console.log(`SekaiHub: [loadComponent] Fetch para ${componentFile} (URL intentada: ${fullAttemptedUrl}) - Status: ${responseStatus}, OK: ${responseOk}`);
-            if (!responseOk) {
-                throw new Error(`No se pudo cargar ${componentFile} desde ${fullAttemptedUrl} (Status: ${responseStatus})`);
+        const SITE_BASE_PATH = getSiteBasePath(); // Esto debe estar después de la definición de la función
+        console.log(`SekaiHub: SITE_BASE_PATH final deducido: "${SITE_BASE_PATH}"`); // Log final
+        
+            async function loadComponent(componentFile, placeholderId) {
+                // Los componentes siempre están en la raíz del proyecto del hub.
+                const fetchUrl = `${SITE_BASE_PATH}/${componentFile}`; 
+        
+                console.log(`SekaiHub: [loadComponent] Página actual: ${window.location.pathname}`);
+                console.log(`SekaiHub: [loadComponent] Intentando fetch de: ${fetchUrl} para placeholder: ${placeholderId}`);
+        
+                try {
+                    const response = await fetch(fetchUrl);
+                    const responseStatus = response.status;
+                    const responseOk = response.ok;
+                    const fullAttemptedUrl = new URL(fetchUrl, window.location.origin).href; 
+        
+                    console.log(`SekaiHub: [loadComponent] Fetch para ${componentFile} (URL intentada: ${fullAttemptedUrl}) - Status: ${responseStatus}, OK: ${responseOk}`);
+        
+                    if (!responseOk) {
+                        throw new Error(`No se pudo cargar ${componentFile} desde ${fullAttemptedUrl} (Status: ${responseStatus})`);
+                    }
+                    const html = await response.text();
+                    const placeholder = document.getElementById(placeholderId);
+                    if (placeholder) {
+                        placeholder.outerHTML = html; 
+                        console.log(`SekaiHub: [loadComponent] Componente '${placeholderId}' cargado DESDE ${fullAttemptedUrl}`);
+                    } else {
+                        console.warn(`SekaiHub: [loadComponent] Placeholder '${placeholderId}' NO ENCONTRADO.`);
+                    }
+                } catch (error) {
+                    console.error(`SekaiHub: [loadComponent] Catch - Error cargando componente '${componentFile}':`, error);
+                    const placeholder = document.getElementById(placeholderId);
+                    if (placeholder) {
+                        placeholder.innerHTML = `<div class="component-error-message" style="color:red; text-align:center; padding:1em; border:1px dashed red; background: #fff0f0;">Error al cargar sección: ${componentFile}.<br>Verifique consola (F12) y ruta: ${fetchUrl}</div>`;
+                    }
+                }
             }
-            const html = await response.text();
-            const placeholder = document.getElementById(placeholderId);
-            if (placeholder) {
-                placeholder.outerHTML = html; 
-                console.log(`SekaiHub: [loadComponent] Componente '${placeholderId}' cargado DESDE ${fullAttemptedUrl}`);
-            } else {
-                console.warn(`SekaiHub: [loadComponent] Placeholder '${placeholderId}' NO ENCONTRADO.`);
-            }
-        } catch (error) {
-            console.error(`SekaiHub: [loadComponent] Catch - Error cargando componente '${componentFile}':`, error);
-            const placeholder = document.getElementById(placeholderId);
-            if (placeholder) {
-                placeholder.innerHTML = `<div class="component-error-message" style="color:red; text-align:center; padding:1em; border:1px dashed red; background: #fff0f0;">Error al cargar sección: ${componentFile}.<br>Verifique consola (F12) y ruta: ${fetchUrl}</div>`;
-            }
-        }
-    }
 
     async function loadLayoutAndInitialize() {
         console.log("SekaiHub: Cargando layout (header y footer)...");
