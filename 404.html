@@ -4,20 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página no Encontrada (404) - SekaiNovels</title>
-    <link rel="stylesheet" href="css/style.css"> 
+
+    <link rel="stylesheet" href="/HUBPRI/css/style.css"> 
 
     <style>
+        /* Tus estilos inline para .error-page-container, h1, p, y el botón temático van aquí */
+        /* (Los mismos que tenías antes, no los repito aquí por brevedad, pero asegúrate que están) */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; 
+            margin: 0; 
+        }
+        main { 
+            flex-grow: 1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
         .error-page-container {
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            justify-content: center; 
+            align-items: center;    
             text-align: center;
-            min-height: calc(100vh - 200px); /* Ajusta 200px según la altura aprox. de tu header+footer */
-            padding: 20px;
+            padding: 30px 15px; 
+            box-sizing: border-box;
+            width: 100%; 
+            max-width: 700px; 
+            margin: 0 auto; 
         }
         .error-page-container h1 {
-            color: var(--text-color-error, #ffdd44); /* Color de error, con un fallback */
+            color: var(--text-color-error, #ffdd44); 
             font-size: 3rem; 
             margin-bottom: 1rem;
         }
@@ -25,50 +43,53 @@
             font-size: 1.2rem; 
             margin-bottom: 1.5rem;
         }
-
-        /* --- INICIO DE LA MODIFICACIÓN SOLO PARA EL BOTÓN --- */
-        /* Estilos base comunes para el botón en ambos temas */
         .error-page-container .button-link { 
             display: inline-block;
-            padding: 12px 28px; /* Ajustado para un look más moderno */
-            font-size: clamp(0.95rem, 3vw, 1.15rem); /* Tamaño de fuente responsive */
+            padding: 12px 28px; 
+            font-size: clamp(0.95rem, 3vw, 1.15rem); 
             text-decoration: none;
             border-radius: 6px; 
-            font-weight: 500; /* Un poco menos pesado que 'bold' */
+            font-weight: 500; 
             border: none; 
             cursor: pointer;
             transition: background-color 0.25s ease, transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Sombra sutil */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
         }
-
         .error-page-container .button-link:hover,
         .error-page-container .button-link:focus {
-            transform: translateY(-1px); /* Pequeño levantamiento al interactuar */
+            transform: translateY(-1px); 
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
             outline: none;
         }
-
-        /* Tema Claro para el botón */
         html[data-theme="light"] .error-page-container .button-link {
-            background-color: var(--button-bg-light-theme, #333333); /* Fondo oscuro (ej: gris oscuro) */
-            color: var(--button-text-light-theme, #fcfcfb); /* TU TEXTO para tema claro */
+            background-color: var(--button-bg-light-theme, #333333); 
+            color: var(--button-text-light-theme, #fcfcfb); 
         }
         html[data-theme="light"] .error-page-container .button-link:hover,
         html[data-theme="light"] .error-page-container .button-link:focus {
-            background-color: var(--button-bg-hover-light-theme, #555555); /* Un poco más claro */
+            background-color: var(--button-bg-hover-light-theme, #555555); 
         }
-
-        /* Tema Oscuro para el botón */
         html[data-theme="dark"] .error-page-container .button-link {
-            background-color: var(--button-bg-dark-theme, #ffdd44); /* TU FONDO DORADO para tema oscuro */
-            color: var(--button-text-dark-theme, #2d2d2d); /* TU TEXTO para tema oscuro */
+            background-color: var(--button-bg-dark-theme, #ffdd44); 
+            color: var(--button-text-dark-theme, #2d2d2d); 
         }
         html[data-theme="dark"] .error-page-container .button-link:hover,
         html[data-theme="dark"] .error-page-container .button-link:focus {
-            background-color: var(--button-bg-hover-dark-theme, #ffe066); /* Dorado un poco más claro */
+            background-color: var(--button-bg-hover-dark-theme, #ffe066); 
         }
-        /* --- FIN DE LA MODIFICACIÓN SOLO PARA EL BOTÓN --- */
-
+         @media (max-width: 600px) {
+            .error-page-container h1 {
+                font-size: clamp(2rem, 10vw, 3rem);
+            }
+            .error-page-container p {
+                font-size: clamp(0.9rem, 4vw, 1.1rem);
+                margin-bottom: 1.5rem;
+            }
+            .error-page-container .button-link { /* Cambiado de .button-link-404 a .button-link para coincidir con tu HTML*/
+                padding: 10px 20px;
+                font-size: clamp(0.9rem, 3.5vw, 1rem);
+            }
+        }
     </style>
 </head>
 <body>
@@ -81,14 +102,15 @@
             <h1>Oops! (404)</h1>
             <p>La página que estás buscando no existe o ha sido movida.</p>
             <p>Puedes intentar volver a la página de inicio.</p>
-            <a href="/HUBPRI/index.html" class="button-link">Volver al Inicio</a>
+            <a href="/HUBPRI/index.html" class="button-link">Volver al Inicio</a> 
         </div>
     </main>
 
     <div id="footer-placeholder">
         <div class="component-loading-placeholder">Cargando pie de página...</div>
     </div>
-    <script src="js/hub-global.js"></script>
+
+    <script src="/HUBPRI/js/hub-global.js" defer></script>
 
 </body>
 </html>
