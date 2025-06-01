@@ -1,6 +1,6 @@
 // js/hub-global.js
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("SekaiHub: DOMContentLoaded. Iniciando script v4 (rutas de componentes mejoradas).");
+    //console.log("SekaiHub: DOMContentLoaded. Iniciando script v4 (rutas de componentes mejoradas).");
 
     // --- Datos de Novelas para el Buscador ---
     // Modifica esto con tus datos reales.
@@ -35,45 +35,45 @@ document.addEventListener('DOMContentLoaded', () => {
             const pathname = window.location.pathname;
             let basePath = "";
         
-            console.log(`[getSiteBasePath] Original Pathname: ${pathname}`);
+           // console.log(`[getSiteBasePath] Original Pathname: ${pathname}`);
         
             if (hostname.endsWith('github.io')) {
                 // Para GitHub Pages, el path suele ser /repoName/ o /repoName/index.html, etc.
                 // Filtramos para quitar segmentos vacíos que pueden surgir de barras iniciales/finales
                 const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
-                console.log(`[getSiteBasePath] Path Segments:`, pathSegments);
-                console.log(`[getSiteBasePath] Comparando con repoName.toLowerCase(): ${repoName.toLowerCase()}`);
+              //  console.log(`[getSiteBasePath] Path Segments:`, pathSegments);
+             //   console.log(`[getSiteBasePath] Comparando con repoName.toLowerCase(): ${repoName.toLowerCase()}`);
         
                 if (pathSegments.length > 0 && pathSegments[0].toLowerCase() === repoName.toLowerCase()) {
                     basePath = `/${pathSegments[0]}`; 
-                    console.log(`[getSiteBasePath] GitHub Pages: repoName encontrado, basePath es: ${basePath}`);
+              //      console.log(`[getSiteBasePath] GitHub Pages: repoName encontrado, basePath es: ${basePath}`);
                 } else {
-                    console.log(`[getSiteBasePath] GitHub Pages: repoName NO encontrado como primer segmento o pathSegments vacío. basePath sigue siendo: "${basePath}"`);
+              //      console.log(`[getSiteBasePath] GitHub Pages: repoName NO encontrado como primer segmento o pathSegments vacío. basePath sigue siendo: "${basePath}"`);
                     // Esto podría suceder si el sitio es un sitio de usuario (rtber.github.io) y el repoName no es parte del path
                     // O si el repoName está mal escrito.
                 }
             } else { 
                 // Servidor Local
                 const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
-                console.log(`[getSiteBasePath] Local Server Path Segments:`, pathSegments);
+           //     console.log(`[getSiteBasePath] Local Server Path Segments:`, pathSegments);
                 if (pathSegments.length > 0 && pathSegments[0].toLowerCase() === repoName.toLowerCase()) {
                      basePath = `/${pathSegments[0]}`; // Si la URL local incluye el nombre del repo
-                     console.log(`[getSiteBasePath] Local Server: repoName encontrado, basePath es: ${basePath}`);
+           //          console.log(`[getSiteBasePath] Local Server: repoName encontrado, basePath es: ${basePath}`);
                 } else {
-                    console.log(`[getSiteBasePath] Local Server: repoName NO encontrado o servido desde raíz. basePath sigue siendo: "${basePath}"`);
+          //          console.log(`[getSiteBasePath] Local Server: repoName NO encontrado o servido desde raíz. basePath sigue siendo: "${basePath}"`);
                 }
             }
             return basePath;
         }
         const SITE_BASE_PATH = getSiteBasePath(); // Esto debe estar después de la definición de la función
-        console.log(`SekaiHub: SITE_BASE_PATH final deducido: "${SITE_BASE_PATH}"`); // Log final
+      //  console.log(`SekaiHub: SITE_BASE_PATH final deducido: "${SITE_BASE_PATH}"`); // Log final
         
             async function loadComponent(componentFile, placeholderId) {
                 // Los componentes siempre están en la raíz del proyecto del hub.
                 const fetchUrl = `${SITE_BASE_PATH}/${componentFile}`; 
         
-                console.log(`SekaiHub: [loadComponent] Página actual: ${window.location.pathname}`);
-                console.log(`SekaiHub: [loadComponent] Intentando fetch de: ${fetchUrl} para placeholder: ${placeholderId}`);
+           //     console.log(`SekaiHub: [loadComponent] Página actual: ${window.location.pathname}`);
+            //    console.log(`SekaiHub: [loadComponent] Intentando fetch de: ${fetchUrl} para placeholder: ${placeholderId}`);
         
                 try {
                     const response = await fetch(fetchUrl);
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const responseOk = response.ok;
                     const fullAttemptedUrl = new URL(fetchUrl, window.location.origin).href; 
         
-                    console.log(`SekaiHub: [loadComponent] Fetch para ${componentFile} (URL intentada: ${fullAttemptedUrl}) - Status: ${responseStatus}, OK: ${responseOk}`);
+                  //  console.log(`SekaiHub: [loadComponent] Fetch para ${componentFile} (URL intentada: ${fullAttemptedUrl}) - Status: ${responseStatus}, OK: ${responseOk}`);
         
                     if (!responseOk) {
                         throw new Error(`No se pudo cargar ${componentFile} desde ${fullAttemptedUrl} (Status: ${responseStatus})`);
@@ -90,12 +90,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     const placeholder = document.getElementById(placeholderId);
                     if (placeholder) {
                         placeholder.outerHTML = html; 
-                        console.log(`SekaiHub: [loadComponent] Componente '${placeholderId}' cargado DESDE ${fullAttemptedUrl}`);
+                     //   console.log(`SekaiHub: [loadComponent] Componente '${placeholderId}' cargado DESDE ${fullAttemptedUrl}`);
                     } else {
                         console.warn(`SekaiHub: [loadComponent] Placeholder '${placeholderId}' NO ENCONTRADO.`);
                     }
                 } catch (error) {
-                    console.error(`SekaiHub: [loadComponent] Catch - Error cargando componente '${componentFile}':`, error);
+                 //   console.error(`SekaiHub: [loadComponent] Catch - Error cargando componente '${componentFile}':`, error);
                     const placeholder = document.getElementById(placeholderId);
                     if (placeholder) {
                         placeholder.innerHTML = `<div class="component-error-message" style="color:red; text-align:center; padding:1em; border:1px dashed red; background: #fff0f0;">Error al cargar sección: ${componentFile}.<br>Verifique consola (F12) y ruta: ${fetchUrl}</div>`;
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
     async function loadLayoutAndInitialize() {
-        console.log("SekaiHub: Cargando layout (header y footer)...");
+        //console.log("SekaiHub: Cargando layout (header y footer)...");
         await Promise.all([
             // <-- NOMBRES DE ARCHIVOS CORREGIDOS -->
             loadComponent('component_header.html', 'header-placeholder'),
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initializeHubFunctionality() {
-        console.log("SekaiHub: initializeHubFunctionality() - Iniciando.");
+      //  console.log("SekaiHub: initializeHubFunctionality() - Iniciando.");
 
         const currentYearSpan = document.getElementById('currentYear');
         if (currentYearSpan) currentYearSpan.textContent = new Date().getFullYear();
@@ -407,7 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!isNaN(fontSize)) applySize();
           })();
           
-        console.log("SekaiHub: Funcionalidades del Hub completamente inicializadas.");
+       // console.log("SekaiHub: Funcionalidades del Hub completamente inicializadas.");
     } // Cierre de initializeHubFunctionality
     
     loadLayoutAndInitialize();
